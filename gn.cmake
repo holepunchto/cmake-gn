@@ -31,39 +31,45 @@ function(add_gn_library name target type)
     endif()
   endforeach()
 
-  string(JSON len LENGTH "${json}" "//${target}" "libs")
+  string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "libs")
 
-  foreach(i RANGE ${len})
-    if(NOT i EQUAL len)
-      string(JSON lib GET "${json}" "//${target}" "libs" ${i})
+  if(error EQUAL "NOTFOUND")
+    foreach(i RANGE ${len})
+      if(NOT i EQUAL len)
+        string(JSON lib GET "${json}" "//${target}" "libs" ${i})
 
-      target_link_libraries(${name} INTERFACE "$<LINK_LIBRARY:DEFAULT,${lib}>")
-    endif()
-  endforeach()
-
-  string(JSON len LENGTH "${json}" "//${target}" "weak_frameworks")
-
-  foreach(i RANGE ${len})
-    if(NOT i EQUAL len)
-      string(JSON framework GET "${json}" "//${target}" "weak_frameworks" ${i})
-
-      list(APPEND frameworks ${framework})
-
-      target_link_libraries(${name} INTERFACE "$<LINK_LIBRARY:WEAK_FRAMEWORK,${framework}>")
-    endif()
-  endforeach()
-
-  string(JSON len LENGTH "${json}" "//${target}" "frameworks")
-
-  foreach(i RANGE ${len})
-    if(NOT i EQUAL len)
-      string(JSON framework GET "${json}" "//${target}" "frameworks" ${i})
-
-      if(NOT framework IN_LIST frameworks)
-        target_link_libraries(${name} INTERFACE "$<LINK_LIBRARY:FRAMEWORK,${framework}>")
+        target_link_libraries(${name} INTERFACE "$<LINK_LIBRARY:DEFAULT,${lib}>")
       endif()
-    endif()
-  endforeach()
+    endforeach()
+  endif()
+
+  string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "weak_frameworks")
+
+  if(error EQUAL "NOTFOUND")
+    foreach(i RANGE ${len})
+      if(NOT i EQUAL len)
+        string(JSON framework GET "${json}" "//${target}" "weak_frameworks" ${i})
+
+        list(APPEND frameworks ${framework})
+
+        target_link_libraries(${name} INTERFACE "$<LINK_LIBRARY:WEAK_FRAMEWORK,${framework}>")
+      endif()
+    endforeach()
+  endif()
+
+  string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "frameworks")
+
+  if(error EQUAL "NOTFOUND")
+    foreach(i RANGE ${len})
+      if(NOT i EQUAL len)
+        string(JSON framework GET "${json}" "//${target}" "frameworks" ${i})
+
+        if(NOT framework IN_LIST frameworks)
+          target_link_libraries(${name} INTERFACE "$<LINK_LIBRARY:FRAMEWORK,${framework}>")
+        endif()
+      endif()
+    endforeach()
+  endif()
 endfunction()
 
 function(find_gn result)
