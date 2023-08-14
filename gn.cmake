@@ -11,6 +11,7 @@ function(add_gn_library name target type)
     COMMAND ${gn} desc ${GN_OUT_DIR} ${target} --format=json
     WORKING_DIRECTORY ${GN_DIR}
     OUTPUT_VARIABLE json
+    COMMAND_ERROR_IS_FATAL ANY
   )
 
   string(JSON output GET "${json}" "//${target}" "outputs" 0)
