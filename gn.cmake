@@ -16,32 +16,42 @@ function(add_gn_library name target type)
 
   string(JSON output GET "${json}" "//${target}" "outputs" 0)
 
-  set(location "${GN_DIR}${output}")
+  set(output "${GN_DIR}${output}")
 
-  cmake_path(NORMAL_PATH location)
+  cmake_path(NORMAL_PATH output)
 
   set_target_properties(
     ${name}
     PROPERTIES
-    IMPORTED_LOCATION ${location}
+    IMPORTED_LOCATION ${output}
   )
 
-  string(JSON len LENGTH "${json}" "//${target}" "include_dirs")
+  string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "include_dirs")
 
-  foreach(i RANGE ${len})
-    if(NOT i EQUAL len)
-      string(JSON dir GET "${json}" "//${target}" "include_dirs" ${i})
+  if(error MATCHES "NOTFOUND")
+    foreach(i RANGE ${len})
+      if(NOT i EQUAL len)
+        string(JSON dir GET "${json}" "//${target}" "include_dirs" ${i})
 
-      target_include_directories(${name} INTERFACE "${GN_DIR}${dir}")
-    endif()
-  endforeach()
+        set(dir "${GN_DIR}${dir}")
+
+        cmake_path(NORMAL_PATH dir)
+
+        target_include_directories(${name} INTERFACE "${dir}")
+      endif()
+    endforeach()
+  endif()
 
   string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "libs")
 
-  if(error EQUAL "NOTFOUND")
+  if(error MATCHES "NOTFOUND")
     foreach(i RANGE ${len})
       if(NOT i EQUAL len)
         string(JSON lib GET "${json}" "//${target}" "libs" ${i})
+
+        set(lib "${GN_DIR}${lib}")
+
+        cmake_path(NORMAL_PATH lib)
 
         target_link_libraries(${name} INTERFACE "$<LINK_LIBRARY:DEFAULT,${lib}>")
       endif()
@@ -50,7 +60,7 @@ function(add_gn_library name target type)
 
   string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "weak_frameworks")
 
-  if(error EQUAL "NOTFOUND")
+  if(error MATCHES "NOTFOUND")
     foreach(i RANGE ${len})
       if(NOT i EQUAL len)
         string(JSON framework GET "${json}" "//${target}" "weak_frameworks" ${i})
@@ -64,7 +74,7 @@ function(add_gn_library name target type)
 
   string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "frameworks")
 
-  if(error EQUAL "NOTFOUND")
+  if(error MATCHES "NOTFOUND")
     foreach(i RANGE ${len})
       if(NOT i EQUAL len)
         string(JSON framework GET "${json}" "//${target}" "frameworks" ${i})
