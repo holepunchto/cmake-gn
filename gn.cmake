@@ -42,6 +42,18 @@ function(add_gn_library name target type)
     endforeach()
   endif()
 
+  string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "defines")
+
+  if(error MATCHES "NOTFOUND")
+    foreach(i RANGE ${len})
+      if(NOT i EQUAL len)
+        string(JSON definition GET "${json}" "//${target}" "defines" ${i})
+
+        target_compile_definitions(${name} INTERFACE ${definition})
+      endif()
+    endforeach()
+  endif()
+
   string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "libs")
 
   if(error MATCHES "NOTFOUND")
