@@ -16,10 +16,14 @@ function(add_gn_library name target type)
 
   string(JSON output GET "${json}" "//${target}" "outputs" 0)
 
+  set(location "${GN_DIR}${output}")
+
+  cmake_path(NORMAL_PATH location)
+
   set_target_properties(
     ${name}
     PROPERTIES
-    IMPORTED_LOCATION "${GN_DIR}${output}"
+    IMPORTED_LOCATION ${location}
   )
 
   string(JSON len LENGTH "${json}" "//${target}" "include_dirs")
