@@ -49,9 +49,13 @@ function(add_gn_library name target type)
       if(NOT i EQUAL len)
         string(JSON lib GET "${json}" "//${target}" "libs" ${i})
 
-        set(lib "${GN_DIR}${lib}")
+        cmake_path(IS_ABSOLUTE lib is_absolute)
 
-        cmake_path(NORMAL_PATH lib)
+        if(is_absolute)
+          set(lib "${GN_DIR}${lib}")
+
+          cmake_path(NORMAL_PATH lib)
+        endif()
 
         target_link_libraries(${name} INTERFACE "$<LINK_LIBRARY:DEFAULT,${lib}>")
       endif()
