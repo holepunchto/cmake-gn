@@ -104,7 +104,7 @@ function(add_gn_library name target type)
 endfunction()
 
 function(find_gn result)
-  find_program(gn NAMES gn)
+  find_program(gn NAMES gn.bat gn REQUIRED)
 
   set(${result} ${gn})
 
