@@ -14,17 +14,19 @@ function(add_gn_library name target type)
     COMMAND_ERROR_IS_FATAL ANY
   )
 
-  string(JSON output GET "${json}" "//${target}" "outputs" 0)
+  string(JSON output ERROR_VARIABLE error GET "${json}" "//${target}" "outputs" 0)
 
-  set(output "${GN_DIR}${output}")
+  if(error MATCHES "NOTFOUND")
+    set(output "${GN_DIR}${output}")
 
-  cmake_path(NORMAL_PATH output)
+    cmake_path(NORMAL_PATH output)
 
-  set_target_properties(
-    ${name}
-    PROPERTIES
-    IMPORTED_LOCATION ${output}
-  )
+    set_target_properties(
+      ${name}
+      PROPERTIES
+      IMPORTED_LOCATION ${output}
+    )
+  endif()
 
   string(JSON len ERROR_VARIABLE error LENGTH "${json}" "//${target}" "include_dirs")
 
