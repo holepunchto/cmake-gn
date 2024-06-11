@@ -2,9 +2,15 @@ set(GN_DIR "" CACHE PATH "Path to the GN root directory")
 
 set(GN_OUT_DIR "" CACHE PATH "Path to the GN output directory")
 
-function(add_gn_library name target type)
-  add_library(${name} ${type} IMPORTED)
+function(find_gn result)
+  find_program(gn NAMES gn.bat gn REQUIRED)
 
+  set(${result} ${gn})
+
+  return(PROPAGATE ${result})
+endfunction()
+
+function(add_gn_target name target)
   find_gn(gn)
 
   execute_process(
@@ -13,6 +19,18 @@ function(add_gn_library name target type)
     OUTPUT_VARIABLE json
     COMMAND_ERROR_IS_FATAL ANY
   )
+
+  string(JSON type GET "${json}" "//${target}" "type")
+
+  if(type MATCHES "static_library")
+    add_gn_static_library(${name} ${target} "${json}")
+  else()
+    message(FATAL_ERROR "Unknown target type \"${type}\" for GN target \"${target}\"")
+  endif()
+endfunction()
+
+function(add_gn_static_library name target json)
+  add_library(${name} STATIC IMPORTED)
 
   string(JSON output ERROR_VARIABLE error GET "${json}" "//${target}" "outputs" 0)
 
@@ -103,12 +121,4 @@ function(add_gn_library name target type)
       endif()
     endforeach()
   endif()
-endfunction()
-
-function(find_gn result)
-  find_program(gn NAMES gn.bat gn REQUIRED)
-
-  set(${result} ${gn})
-
-  return(PROPAGATE ${result})
 endfunction()
