@@ -57,7 +57,9 @@ function(add_gn_static_library name target json)
 
         cmake_path(NORMAL_PATH dir)
 
-        target_include_directories(${name} INTERFACE "${dir}")
+        if(IS_DIRECTORY "${dir}")
+          target_include_directories(${name} INTERFACE "${dir}")
+        endif()
       endif()
     endforeach()
   endif()
