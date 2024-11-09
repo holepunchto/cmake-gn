@@ -1,6 +1,6 @@
 {
   "name": "cmake-gn",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bridging CMake and GN, the meta-build system from Google",
   "files": [
     "*.cmake"
