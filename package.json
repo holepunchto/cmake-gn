@@ -1,0 +1,18 @@
+{
+  "name": "cmake-gn",
+  "version": "1.0.0",
+  "description": "Bridging CMake and GN, the meta-build system from Google",
+  "files": [
+    "*.cmake"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/cmake-gn.git"
+  },
+  "author": "Holepunch",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/cmake-gn/issues"
+  },
+  "homepage": "https://github.com/holepunchto/cmake-gn#readme"
+}

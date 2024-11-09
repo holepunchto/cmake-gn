@@ -1,3 +1,5 @@
+include_guard()
+
 set(GN_DIR "" CACHE PATH "Path to the GN root directory")
 
 set(GN_OUT_DIR "" CACHE PATH "Path to the GN output directory")
